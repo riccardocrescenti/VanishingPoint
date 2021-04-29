@@ -16,7 +16,6 @@ public class VanishingPoint {
 
     public void run(String[] args) {
         // Dichiarazione variabili
-        Mat canny = new Mat();
         Mat cdst = new Mat();
 
         int lowThresholdCanny;
@@ -40,37 +39,55 @@ public class VanishingPoint {
 
         int nArgs = args.length;
 
+        // in base al numero di parametri inseriti da utente assegno i valori soglia
         switch (nArgs){
             case 1:
                 imagePath = args[0];
                 lowThresholdCanny = DEFAULT_LTC;
                 highThresholdCanny = DEFAULT_HTC;
                 houghThreshold = DEFAULT_HOUGH;
-                System.out.println("N argomenti " + nArgs);
                 break;
 
             case 2:
                 imagePath = args[0];
+                try {
+                    Integer.parseInt(args[1]);
+                } catch (NumberFormatException e){
+                    System.err.println("Incorrect threshold values");
+                    return;
+                }
                 lowThresholdCanny = Integer.parseInt(args[1]);
                 highThresholdCanny = DEFAULT_HTC;
                 houghThreshold = DEFAULT_HOUGH;
-                System.out.println("N argomenti " + nArgs);
                 break;
 
             case 3:
                 imagePath = args[0];
+                try {
+                    Integer.parseInt(args[1]);
+                    Integer.parseInt(args[2]);
+                } catch (NumberFormatException e){
+                    System.err.println("Incorrect threshold values");
+                    return;
+                }
                 lowThresholdCanny = Integer.parseInt(args[1]);
                 highThresholdCanny = Integer.parseInt(args[2]);
                 houghThreshold = DEFAULT_HOUGH;
-                System.out.println("N argomenti " + nArgs);
                 break;
 
             case 4:
                 imagePath = args[0];
+                try {
+                    Integer.parseInt(args[1]);
+                    Integer.parseInt(args[2]);
+                    Integer.parseInt(args[3]);
+                } catch (NumberFormatException e){
+                    System.err.println("Incorrect threshold values");
+                    return;
+                }
                 lowThresholdCanny = Integer.parseInt(args[1]);
                 highThresholdCanny = Integer.parseInt(args[2]);
                 houghThreshold = Integer.parseInt(args[3]);
-                System.out.println("N argomenti " + nArgs);
                 break;
 
             default:
@@ -78,30 +95,31 @@ public class VanishingPoint {
                 lowThresholdCanny = DEFAULT_LTC;
                 highThresholdCanny = DEFAULT_HTC;
                 houghThreshold = DEFAULT_HOUGH;
-                System.out.println("N argomenti " + nArgs);
-
         }
+
+
 
         // Carico l'immagine e la converto in scala di grigi
         Mat src = Imgcodecs.imread(imagePath, Imgcodecs.IMREAD_GRAYSCALE);
 
         // Controllo se l'immagine è stata caricata correttamente
         if (src.empty()) {
-            System.out.println("Error opening image!");
+            System.out.println("Error opening image! Wrong path");
             System.exit(-1);
         }
-        System.out.println("altezza: "+src.rows() +" larghezza: "+ src.cols());
+        System.out.println("-Image: " + imagePath);
+        System.out.println("-Image Parameters:\n\tHeight: "+src.rows() +"\tWidth: "+ src.cols());
+        System.out.println("-Threshold Parameters:\n " + "\tLow Threshold Canny \t" + lowThresholdCanny);
+        System.out.println("\tHigh Threshold Canny \t" +highThresholdCanny);
+        System.out.println("\tHough Threshold \t" +houghThreshold);
 
         Mat srcBlur= new Mat();
         Mat cannyBlurred= new Mat();
         Size BLUR_SIZE= new Size(3,3);
 
-        // filtro smoothing
+        // filtro smoothing e Canny
         Imgproc.blur(src, srcBlur, BLUR_SIZE);
         Imgproc.Canny(srcBlur, cannyBlurred, lowThresholdCanny, highThresholdCanny, 3, true);
-
-        // Applico il filtro Canny
-        Imgproc.Canny(src,canny,lowThresholdCanny,highThresholdCanny,3,true);
 
         // Copy edges to the images that will display the results in BGR
         Imgproc.cvtColor(src, cdst, Imgproc.COLOR_GRAY2BGR);
@@ -118,18 +136,19 @@ public class VanishingPoint {
         draw_lines(cdst, lines, parametersRhoTheta);
         draw_intersections(cdst, intersections, parametersRhoTheta);
 
-        System.out.println("Sono state rilevate " + intersections.size() + " intersezioni");
-        for (Point p:intersections) {
+        System.out.println("-Intersections detected: " + intersections.size());
+        /*for (Point p:intersections) {
             System.out.println("coordinate intersezione: "+p);
-        }
+        }*/
 
         draw_vanishingPoint(cdst,intersections);
 
-        HighGui.imshow("Original Image", src);
-        HighGui.imshow("Canny Edge Detector", canny);
-        HighGui.imshow("Canny Blurred", cannyBlurred);
+        HighGui.imshow("Greyscale Image", src);
 
-        HighGui.imshow("Vanishing Point of the Image", cdst);
+        HighGui.imshow("Canny Edge Detector", cannyBlurred);
+
+        HighGui.imshow("Vanishing Point", cdst);
+
         HighGui.waitKey();
         System.exit(0);
     }
@@ -147,7 +166,7 @@ public class VanishingPoint {
 
         } else {
 
-            System.out.println("Non ci sono intersezioni! Diminuire i valori soglia");
+            System.out.println("There are no intersections! Please decrease threshold values");
             System.exit(-1);
 
         }
@@ -196,8 +215,8 @@ public class VanishingPoint {
                 // metodo per disegnare le rette
                 Imgproc.line(cdst, pt1, pt2, new Scalar(0, 0, 255), 1, Imgproc.LINE_4, 0); //Imgproc.LINE_AA
 
-                System.out.println("rho " + rho);
-                System.out.println("theta " + theta);
+                //System.out.println("rho " + rho);
+                //System.out.println("theta " + theta);
                 Point p = new Point(rho, theta);
                 parametersRhoTheta.add(p);
             }
@@ -245,18 +264,18 @@ public class VanishingPoint {
                 distanza= Math.sqrt(Math.pow(list.get(i).x-list.get(j).x,2) + Math.pow(list.get(i).y - list.get(j).y,2));
                 sommadistanze[i]+=distanza;
             }
-        System.out.println("vettore somma distanze: ");
+        //System.out.println("vettore somma distanze: ");
         sommaminima=sommadistanze[0];
 
         for (int i=0;i<sommadistanze.length-1;i++){
-            System.out.println(sommadistanze[i] +"  " +sommadistanze.length);
+            //System.out.println(sommadistanze[i] +"  " +sommadistanze.length);
             if (sommadistanze[i]<sommaminima){
                 sommaminima=sommadistanze[i];
                 vanishingP= list.get(i);
             }
         }
 
-        System.out.println("VANISHING "+vanishingP + "somma minima " +sommaminima);
+        System.out.println("\n-Coordinate of the Vanishing Point " + vanishingP);
         return vanishingP;
     }
 
