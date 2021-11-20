@@ -21,9 +21,9 @@ src/strada_2.png    100 200 110
 
 ## Recommended threshold values associated to the specific image:
 
-src/corridoio.png   100 200 100
-src/strada_1.jpg    100 200 140
-src/strada_2.png    100 200 110
-src/strada_3.jpg    100 200 110
-src/rotaie.png      100 200 140
-src/staccionata.png 100 200 140
+- src/corridoio.png   100 200 100
+- src/strada_1.jpg    100 200 140
+- src/strada_2.png    100 200 110
+- src/strada_3.jpg    100 200 110
+- src/rotaie.png      100 200 140
+- src/staccionata.png 100 200 140
