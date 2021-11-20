@@ -19,7 +19,7 @@ The user can type some parameters in order to customize the results
 If there are no parameters inserted by the user, these are the default ones:
 src/strada_2.png    100 200 110
 
-### Recommended threshold values associated to the specific image:
+## Recommended threshold values associated to the specific image:
 
 src/corridoio.png   100 200 100
 src/strada_1.jpg    100 200 140
